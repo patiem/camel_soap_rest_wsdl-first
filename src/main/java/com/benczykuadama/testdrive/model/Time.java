@@ -8,10 +8,10 @@ public class Time {
     private LocalDateTime now;
     private String message;
 
-    public Time(Integer id, String message) {
+    public Time(Integer id, String message, LocalDateTime now) {
         this.id = id;
         this.message = message;
-        this.now = LocalDateTime.now();
+        this.now = now;
     }
 
     public void setId(Integer id) {
