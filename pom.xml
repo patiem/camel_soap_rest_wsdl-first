@@ -51,6 +51,8 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
+        <finalName>docker-testdrive</finalName>
+
     </build>
 
     <!--what for??-->
