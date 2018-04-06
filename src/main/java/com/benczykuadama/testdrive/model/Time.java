@@ -7,11 +7,14 @@ public class Time {
     private Integer id;
     private LocalDateTime now;
     private String message;
+    private String lol;
 
     public Time(Integer id, String message, LocalDateTime now) {
         this.id = id;
         this.message = message;
         this.now = now;
+        lol = "LOL";
+
     }
 
     public void setId(Integer id) {
@@ -36,5 +39,13 @@ public class Time {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getLol() {
+        return lol;
+    }
+
+    public void setLol(String lol) {
+        this.lol = lol;
     }
 }
