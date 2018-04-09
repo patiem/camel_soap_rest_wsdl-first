@@ -21,10 +21,16 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>9</java.version>
+        <java.version>1.8</java.version>
     </properties>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -54,15 +60,27 @@
             <plugin>
                 <groupId>io.fabric8</groupId>
                 <artifactId>fabric8-maven-plugin</artifactId>
-                <version>3.5.33</version>
-
-
+                <version>3.5.38</version>
                 <configuration>
+                    <mode>openshift</mode>
+                    <buildStrategy>docker</buildStrategy>
                     <images>
                         <image>
                             <name>docker-testdrive</name>
+                            <alias>docker-testdrive</alias>
                             <build>
-                                <dockerFileDir>${project.basedir}</dockerFileDir>
+                                <from>openjdk:9.0.4-jdk</from>
+                                <!--<ports>-->
+                                    <!--<port>8085</port>-->
+                                <!--</ports>-->
+                                <entryPoint>
+                                    <!-- exec form  -->
+                                    <exec>
+                                        <arg>java</arg>
+                                        <arg>-jar</arg>
+                                        <arg>maven/docker-testdrive.jar</arg>
+                                    </exec>
+                                </entryPoint>
                                 <assembly>
                                     <descriptorRef>artifact-with-dependencies</descriptorRef>
                                 </assembly>
@@ -70,19 +88,99 @@
                             </build>
                         </image>
                     </images>
+
+                    <!--<resources>-->
+                        <!--<labels>-->
+                            <!--<deployment>-->
+                                <!--<name>docker-testdrive</name>-->
+                                <!--<replicas>1</replicas>-->
+
+                                <!--<containers>-->
+                                    <!--<name>docker-app</name>-->
+                                    <!--<container>-->
+                                        <!--<name>docker-app</name>-->
+                                        <!--<alias>docker-app</alias>-->
+                                        <!--<ports>-->
+                                            <!--<port>8085</port>-->
+                                        <!--</ports>-->
+                                        <!--<mounts>-->
+                                            <!--<scratch>/var/scratch</scratch>-->
+                                        <!--</mounts>-->
+                                    <!--</container>-->
+                                <!--</containers>-->
+
+                                <!--<volumes>-->
+                                    <!--<volume>-->
+                                        <!--<name>scratch</name>-->
+                                        <!--<type>emptyDir</type>-->
+                                    <!--</volume>-->
+                                <!--</volumes>-->
+                            <!--</deployment>-->
+                        <!--</labels>-->
+
+
+
+                        <!--<services>-->
+                            <!--<service>-->
+                                <!--<name>docker-srocker</name>-->
+                                <!--<headless>true</headless>-->
+                            <!--</service>-->
+                        <!--</services>-->
+                    <!--</resources>-->
+
                 </configuration>
 
                 <executions>
                     <execution>
-                        <id>package</id>
-                        <phase>package</phase>
+                        <id>fmp</id>
                         <goals>
+                            <goal>resource</goal>
+                            <goal>helm</goal>
                             <goal>build</goal>
                         </goals>
                     </execution>
                 </executions>
-
             </plugin>
+
+
+            <!--only build works here with use of Dockerfile-->
+            <!--<plugin>-->
+            <!--<groupId>org.springframework.boot</groupId>-->
+            <!--<artifactId>spring-boot-maven-plugin</artifactId>-->
+            <!--</plugin>-->
+
+            <!--<plugin>-->
+            <!--<groupId>io.fabric8</groupId>-->
+            <!--<artifactId>fabric8-maven-plugin</artifactId>-->
+            <!--<version>3.5.33</version>-->
+
+
+            <!--<configuration>-->
+            <!--<images>-->
+            <!--<image>-->
+            <!--<name>docker-testdrive</name>-->
+            <!--<build>-->
+            <!--<dockerFileDir>${project.basedir}</dockerFileDir>-->
+            <!--<assembly>-->
+            <!--<descriptorRef>artifact-with-dependencies</descriptorRef>-->
+            <!--</assembly>-->
+            <!--&lt;!&ndash;<dockerFile>${project.basedir}/Dockerfile</dockerFile>&ndash;&gt;-->
+            <!--</build>-->
+            <!--</image>-->
+            <!--</images>-->
+            <!--</configuration>-->
+
+            <!--<executions>-->
+            <!--<execution>-->
+            <!--<id>package</id>-->
+            <!--<phase>package</phase>-->
+            <!--<goals>-->
+            <!--<goal>build</goal>-->
+            <!--</goals>-->
+            <!--</execution>-->
+            <!--</executions>-->
+
+            <!--</plugin>-->
 
             <!--<plugin>-->
             <!--<artifactId>exec-maven-plugin</artifactId>-->
