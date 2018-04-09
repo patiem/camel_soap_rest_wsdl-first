@@ -13,7 +13,7 @@ public class Time {
         this.id = id;
         this.message = message;
         this.now = now;
-        lol = "LOL";
+        lol = "SROL";
 
     }
 
