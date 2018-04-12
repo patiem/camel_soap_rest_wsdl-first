@@ -51,10 +51,10 @@
             <version>${camel.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.boot</groupId>-->
+            <!--<artifactId>spring-boot-starter-web</artifactId>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -90,7 +90,9 @@
                             <alias>docker-testdrive</alias>
                             <build>
                                 <from>openjdk:8u162-jre</from>
-
+                                <ports>
+                                    <port>8085</port>
+                                </ports>
                                 <entryPoint>
                                     <!-- exec form  -->
                                     <exec>

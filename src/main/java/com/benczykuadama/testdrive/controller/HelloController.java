@@ -1,25 +1,15 @@
 package com.benczykuadama.testdrive.controller;
 
 
-import org.apache.camel.ProducerTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-@RestController
+//@RestController
 public class HelloController {
 
-    @Autowired
-    ProducerTemplate producerTemplate;
-
-    @RequestMapping("/")
-    public void startCamel() {
-        producerTemplate.sendBody("direct:firstRoute", "Calling via Spring Boot Rest Controller, <b>Hello</b> my preciousssss\"");
-    }
-
+//    @Autowired
+//    ProducerTemplate producerTemplate;
+//
 //    @RequestMapping("/")
-//    public String index() {
-//        return "<b>Hello</b> my preciousssss";
+//    public void startCamel() {
+//        producerTemplate.sendBody("direct:firstRoute", "Calling via Spring Boot Rest Controller, <b>Hello</b> my preciousssss\"");
 //    }
 
 }
