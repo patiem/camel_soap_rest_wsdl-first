@@ -3,8 +3,6 @@ package com.benczykuadama.testdrive.routes;
 import com.benczykuadama.testdrive.model.Time;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
-import org.apache.camel.json.simple.JsonArray;
-import org.apache.camel.model.dataformat.JsonDataFormat;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.camel.model.rest.RestBindingMode;
 import org.apache.camel.model.rest.RestParamType;
@@ -13,7 +11,6 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.StreamingOutput;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -32,8 +29,7 @@ public class TimeRoute extends RouteBuilder {
                 .get()
                 .param().name("name").defaultValue("filthy worm").type(RestParamType.query).dataType("String").endParam()
                 .to("bean:timeService?method=getTime(${header.name})");
-
-
+        
         from("rest:get:/processtime")
                 .process(exchange -> {
                     Time time = new Time();
@@ -58,53 +54,36 @@ public class TimeRoute extends RouteBuilder {
                     List<String> names = queryMap.getOrDefault("name", noName);
                     exchange.getOut().setBody(names);
                 })
-                .split(body())
+                .split(body(), new TimeAgrr())
                 .to(("bean:timeService?method=getTime(${body})"))
-                .log("${body}").end()
+                .end()
+                .marshal()
+                .json(JsonLibrary.Jackson);
+    }
+}
 
-                .aggregate(new AggregationStrategy() {
-                    @Override
-                    public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
-                        if (oldExchange == null) {
-                            List<Time> list = new ArrayList<>();
-                            list.add((Time) newExchange.getIn().getBody());
-                            newExchange.getIn().setBody(list);
-                            return newExchange;
-                        } else {
-                            Object oldIn = oldExchange.getIn().getBody();
-                            ArrayList<Time> list = null;
-                            if(oldIn instanceof ArrayList) {
-                                list = (ArrayList<Time>) oldIn;
-                            } else {
-                                list = new ArrayList<Time>();
-                                list.add((Time) oldIn);
-                            }
-                            list.add((Time) newExchange.getIn().getBody());
-                            newExchange.getIn().setBody(list);
-                            return newExchange;
-                        }
-                })
+@Component
+class TimeAgrr implements AggregationStrategy {
 
+    @Override
+    public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
+        if (oldExchange == null) {
+            Time firstTime = newExchange.getIn().getBody(Time.class);
+            System.out.println("first:" + firstTime);
+            List<Time> times = new ArrayList<>();
+            times.add(firstTime);
+            newExchange.getIn().setBody(times);
+            return newExchange;
+        }
 
+        Time nextTime = newExchange.getIn().getBody(Time.class);
+        System.out.println("nest:" + nextTime);
 
-//        from("rest:get:manytime")
-//                .process(exchange -> {
-//                    String queryString = exchange.getIn().getHeader(Exchange.HTTP_QUERY, String.class);
-//                    MultivaluedMap<String, String> queryMap = JAXRSUtils.getStructuredParams(queryString, "&", false, false);
-//
-//                    List<String> noName = Arrays.asList("You Who Have No Name");
-//                    List<String> names = queryMap.getOrDefault("name", noName);
-//
-////                    Map<String, List<String>> body = new HashMap();
-////                    body.put("names", names);
-//                    exchange.getOut().setBody(names);
-//                })
-//                .split(simple("${body.names}"))
-//                .process(exchange -> {
-//                    System.out.printf("aaaa");
-//                    System.out.println(exchange.getIn().getHeaders());
-//                    System.out.println(exchange.getIn().getBody());
-//                })
-//                .marshal().json(JsonLibrary.Jackson);
+        ArrayList<Time> times = oldExchange.getIn().getBody(ArrayList.class);
+        System.err.println(times);
+
+        times.add(nextTime);
+        newExchange.getIn().setBody(times);
+        return newExchange;
     }
 }
