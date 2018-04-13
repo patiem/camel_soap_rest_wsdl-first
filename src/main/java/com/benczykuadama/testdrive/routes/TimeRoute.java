@@ -3,14 +3,19 @@ package com.benczykuadama.testdrive.routes;
 import com.benczykuadama.testdrive.model.Time;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.json.simple.JsonArray;
+import org.apache.camel.model.dataformat.JsonDataFormat;
 import org.apache.camel.model.dataformat.JsonLibrary;
 import org.apache.camel.model.rest.RestBindingMode;
 import org.apache.camel.model.rest.RestParamType;
+import org.apache.camel.processor.aggregate.AggregationStrategy;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.StreamingOutput;
 import java.time.LocalDateTime;
+import java.util.*;
 
 
 @Component
@@ -46,13 +51,60 @@ public class TimeRoute extends RouteBuilder {
 
         from("rest:get:manytime")
                 .process(exchange -> {
+
                     String queryString = exchange.getIn().getHeader(Exchange.HTTP_QUERY, String.class);
                     MultivaluedMap<String, String> queryMap = JAXRSUtils.getStructuredParams(queryString, "&", false, false);
-                    System.out.println(queryString);
-                    System.out.println(queryMap);
-                    for(String param : queryMap.keySet()) System.out.println(queryMap.getFirst(param));
-
+                    List<String> noName = Arrays.asList("You Who Have No Name");
+                    List<String> names = queryMap.getOrDefault("name", noName);
+                    exchange.getOut().setBody(names);
                 })
-                .marshal().json(JsonLibrary.Jackson);
+                .split(body())
+                .to(("bean:timeService?method=getTime(${body})"))
+                .log("${body}").end()
+
+                .aggregate(new AggregationStrategy() {
+                    @Override
+                    public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
+                        if (oldExchange == null) {
+                            List<Time> list = new ArrayList<>();
+                            list.add((Time) newExchange.getIn().getBody());
+                            newExchange.getIn().setBody(list);
+                            return newExchange;
+                        } else {
+                            Object oldIn = oldExchange.getIn().getBody();
+                            ArrayList<Time> list = null;
+                            if(oldIn instanceof ArrayList) {
+                                list = (ArrayList<Time>) oldIn;
+                            } else {
+                                list = new ArrayList<Time>();
+                                list.add((Time) oldIn);
+                            }
+                            list.add((Time) newExchange.getIn().getBody());
+                            newExchange.getIn().setBody(list);
+                            return newExchange;
+                        }
+                })
+
+
+
+//        from("rest:get:manytime")
+//                .process(exchange -> {
+//                    String queryString = exchange.getIn().getHeader(Exchange.HTTP_QUERY, String.class);
+//                    MultivaluedMap<String, String> queryMap = JAXRSUtils.getStructuredParams(queryString, "&", false, false);
+//
+//                    List<String> noName = Arrays.asList("You Who Have No Name");
+//                    List<String> names = queryMap.getOrDefault("name", noName);
+//
+////                    Map<String, List<String>> body = new HashMap();
+////                    body.put("names", names);
+//                    exchange.getOut().setBody(names);
+//                })
+//                .split(simple("${body.names}"))
+//                .process(exchange -> {
+//                    System.out.printf("aaaa");
+//                    System.out.println(exchange.getIn().getHeaders());
+//                    System.out.println(exchange.getIn().getBody());
+//                })
+//                .marshal().json(JsonLibrary.Jackson);
     }
 }
