@@ -34,76 +34,72 @@ public class TimeRouteTest extends CamelTestSupport {
 
             }
         };
-
-
         context.getRouteDefinition("marsh")
                 .adviceWith(context, mockResult);
     }
 
 
-//    @Test
-//    public void getsJsonWithMessageWhenNoNameIsProvided() throws Exception {
-//
-//        String correctMessage = "You are still alive, my dear My PRECIOUS!";
-//        MockEndpoint mock = getMockEndpoint("mock:result");
-//
-//        context.start();
-//        template.requestBody("rest:get:processtime", "");
-//
-//        System.out.println("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ");
-//
-//        mock.expectedMessageCount(1);
-//        mock.assertIsSatisfied();
-//
-//        Time time = mock.getExchanges().get(0).getIn().getBody(Time.class);
-//        assertEquals(correctMessage, time.getMessage());
-//
-//        context.stop();
-//    }
+    @Test
+    public void getsJsonWithMessageWhenNoNameIsProvided() throws Exception {
 
-//    @Test
-//    public void getsJsonWithMessageWheNameIsProvided() throws Exception {
-//
-//        String correctMessage = "You are still alive, my dear Lolek!";
-//        MockEndpoint mock = getMockEndpoint("mock:result");
-//
-//        context.start();
-//        template.requestBodyAndHeader("rest:get:processtime", "", "name", "Lolek");
-//
-//        System.out.println("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ");
-//
-//        mock.expectedMessageCount(1);
-//        mock.assertIsSatisfied();
-//
-//        Time time = mock.getExchanges().get(0).getIn().getBody(Time.class);
-//        assertEquals(correctMessage, time.getMessage());
-//assertNotNull(time.getNow());
+        String correctMessage = "You are still alive, my dear My PRECIOUS!";
+        MockEndpoint mock = getMockEndpoint("mock:result");
 
-//
-//        context.stop();
-//    }
+        context.start();
+        template.requestBody("rest:get:processtime", "");
 
-//    @Test
-//    public void getsJsonWithOneTimeWheNameIsNotProvided() throws Exception {
-//
-//
-//        String correctMessage = "You are still alive, my dear You are still alive, my dear You Who Have No Name!!";
-//        MockEndpoint mock = getMockEndpoint("mock:result");
-//
-//        context.start();
-//        template.requestBody("rest:get:manytime", "");
-//
-//        System.out.println("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ");
-//
-//        mock.expectedMessageCount(1);
-//        mock.assertIsSatisfied();
-//
-//        Time time = (Time) mock.getExchanges().get(0).getIn().getBody(ArrayList.class).get(0);
-//        assertEquals(correctMessage, time.getMessage());
-//        assertNotNull(time.getNow());
-//
-//        context.stop();
-//    }
+        System.out.println("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ");
+
+        mock.expectedMessageCount(1);
+        mock.assertIsSatisfied();
+
+        Time time = mock.getExchanges().get(0).getIn().getBody(Time.class);
+        assertEquals(correctMessage, time.getMessage());
+
+        context.stop();
+    }
+
+    @Test
+    public void getsJsonWithMessageWheNameIsProvided() throws Exception {
+
+        String correctMessage = "You are still alive, my dear Lolek!";
+        MockEndpoint mock = getMockEndpoint("mock:result");
+
+        context.start();
+        template.requestBodyAndHeader("rest:get:processtime", "", "name", "Lolek");
+
+        System.out.println("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ");
+
+        mock.expectedMessageCount(1);
+        mock.assertIsSatisfied();
+
+        Time time = mock.getExchanges().get(0).getIn().getBody(Time.class);
+        assertEquals(correctMessage, time.getMessage());
+        assertNotNull(time.getNow());
+        context.stop();
+    }
+
+    @Test
+    public void getsJsonWithOneTimeWheNameIsNotProvided() throws Exception {
+
+
+        String correctMessage = "You are still alive, my dear You are still alive, my dear You Who Have No Name!!";
+        MockEndpoint mock = getMockEndpoint("mock:result");
+
+        context.start();
+        template.requestBody("rest:get:manytime", "");
+
+        System.out.println("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ");
+
+        mock.expectedMessageCount(1);
+        mock.assertIsSatisfied();
+
+        Time time = (Time) mock.getExchanges().get(0).getIn().getBody(ArrayList.class).get(0);
+        assertEquals(correctMessage, time.getMessage());
+        assertNotNull(time.getNow());
+
+        context.stop();
+    }
 
     @Test
     public void getsJsonWithManyTimesWheNamesAreProvided() throws Exception {
@@ -113,7 +109,7 @@ public class TimeRouteTest extends CamelTestSupport {
         String name2 = "BBB";
         String name3 = "CCC";
 
-        String[] names = new String[] {name1, name2, name3};
+        String[] names = new String[]{name1, name2, name3};
 
         MockEndpoint mock = getMockEndpoint("mock:result");
 
@@ -127,7 +123,7 @@ public class TimeRouteTest extends CamelTestSupport {
 
         ArrayList<Time> times = mock.getExchanges().get(0).getIn().getBody(ArrayList.class);
         int i = 0;
-        for(Time time : times) {
+        for (Time time : times) {
             assertEquals(String.format(correctMessage, names[i++]), time.getMessage());
             assertNotNull(time.getNow());
         }

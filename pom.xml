@@ -96,8 +96,8 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-test</artifactId>
-            <version>RELEASE</version>
-            <scope>compile</scope>
+            <version>${camel.version}</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
