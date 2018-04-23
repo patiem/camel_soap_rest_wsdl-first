@@ -29,8 +29,11 @@ public class TimeRoute extends RouteBuilder {
                 .get()
                 .param().name("name").defaultValue("filthy worm").type(RestParamType.query).dataType("String").endParam()
                 .to("bean:timeService?method=getTime(${header.name})");
+
         
-        from("rest:get:/processtime")
+        from("rest:get:processtime").routeId("processTime").to("direct:makeTime");
+
+        from("direct:makeTime").routeId("makeTime")
                 .process(exchange -> {
                     Time time = new Time();
                     String name = exchange.getIn().getHeader("name", "My PRECIOUS", String.class);
@@ -41,7 +44,9 @@ public class TimeRoute extends RouteBuilder {
                     Time time = exchange.getIn().getBody(Time.class);
                     time.setNow(LocalDateTime.now());
                     exchange.getOut().setBody(time);
-                })
+                }).to("direct:marsh");
+
+        from("direct:marsh").routeId("marsh")
                 .marshal().json(JsonLibrary.Jackson);
 
 
@@ -54,7 +59,7 @@ public class TimeRoute extends RouteBuilder {
                     List<String> names = queryMap.getOrDefault("name", noName);
                     exchange.getOut().setBody(names);
                 })
-                .split(body(), new TimeAgrr())
+                .split(body(), new TimeAgrr()).parallelProcessing()
                 .to(("bean:timeService?method=getTime(${body})"))
                 .end()
                 .marshal()
