@@ -62,8 +62,8 @@ public class TimeRoute extends RouteBuilder {
                 .split(body(), new TimeAgrr()).parallelProcessing()
                 .to(("bean:timeService?method=getTime(${body})"))
                 .end()
-                .marshal()
-                .json(JsonLibrary.Jackson);
+                .to("direct:marsh");
+
     }
 }
 
