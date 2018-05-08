@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="students"
+                  targetNamespace="benczykuadama.com/testdrive/wsdl"
+                  xmlns:tns="benczykuadama.com/testdrive/wsdl"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+    <!-- wsdl:types :: Defines the XML schema and data types used by the web service -->
+    <wsdl:types>
+        <xsd:schema targetNamespace="benczykuadama.com/testdrive/wsdl"
+                    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                    elementFormDefault="qualified"
+                    attributeFormDefault="unqualified" version="1.0">
+
+            <xsd:element name="input">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="requestName" type="xsd:string" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="output">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="outputResult" type="xsd:string" />
+                        <xsd:element name="time" type="xsd:string" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:schema>
+    </wsdl:types>
+
+    <!-- wsdl:message :: Defines the data for input and output operation -->
+    <wsdl:message name="request">
+        <wsdl:part element="tns:input" name="requestPart" />
+    </wsdl:message>
+    <wsdl:message name="response">
+        <wsdl:part element="tns:output" name="responsePart" />
+    </wsdl:message>
+
+    <!-- wsdl:portType :: Defines input and output operations that can be performed with the service -->
+    <wsdl:portType name="greetings">
+        <wsdl:operation name="greet">
+            <wsdl:input message="tns:request" name="greetRequest"/>
+            <wsdl:output message="tns:response" name="greetResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+
+    <!-- wsdl:binding :: Defines the protocol and data format for each port type use="literal"-->
+    <wsdl:binding name="greetingsEndpointBinding" type="tns:greetings">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="greet">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body parts="requestPart" use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body parts="responsePart" use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+
+    <!-- wsdl:service :: Defines service details -->
+    <wsdl:service name="greetingsEndpointService">
+        <wsdl:port binding="tns:greetingsEndpointBinding" name="greetingsEndpoint">
+            <!--soap:address can be anything-->
+
+            <soap:address location="http://localhost:8085/greetings" />
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

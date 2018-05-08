@@ -79,58 +79,6 @@ public class TimeRouteTest extends CamelTestSupport {
         context.stop();
     }
 
-    @Test
-    public void getsJsonWithOneTimeWheNameIsNotProvided() throws Exception {
-
-
-        String correctMessage = "You are still alive, my dear You are still alive, my dear You Who Have No Name!!";
-        MockEndpoint mock = getMockEndpoint("mock:result");
-
-        context.start();
-        template.requestBody("rest:get:manytime", "");
-
-        System.out.println("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ");
-
-        mock.expectedMessageCount(1);
-        mock.assertIsSatisfied();
-
-        Time time = (Time) mock.getExchanges().get(0).getIn().getBody(ArrayList.class).get(0);
-        assertEquals(correctMessage, time.getMessage());
-        assertNotNull(time.getNow());
-
-        context.stop();
-    }
-
-    @Test
-    public void getsJsonWithManyTimesWheNamesAreProvided() throws Exception {
-
-        String correctMessage = "You are still alive, my dear You are still alive, my dear %s!!";
-        String name1 = "AAA";
-        String name2 = "BBB";
-        String name3 = "CCC";
-
-        String[] names = new String[]{name1, name2, name3};
-
-        MockEndpoint mock = getMockEndpoint("mock:result");
-
-        context.start();
-        template.requestBody("rest:get:manytime?name=AAA&name=BBB&name=CCC", "");
-
-        System.out.println("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ");
-
-        mock.expectedMessageCount(1);
-        mock.assertIsSatisfied();
-
-        ArrayList<Time> times = mock.getExchanges().get(0).getIn().getBody(ArrayList.class);
-        int i = 0;
-        for (Time time : times) {
-            assertEquals(String.format(correctMessage, names[i++]), time.getMessage());
-            assertNotNull(time.getNow());
-        }
-
-        context.stop();
-    }
-
     @Override
     public boolean isUseAdviceWith() {
         return true;
