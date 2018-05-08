@@ -20,10 +20,13 @@ public class TimeRoute extends RouteBuilder {
 
         restConfiguration()
                 .component("servlet")
-                .host("0.0.0.0").port(8085).bindingMode(RestBindingMode.json);
+                .host("0.0.0.0").port(8085)
+                .bindingMode(RestBindingMode.json);
 
 
-        from("rest:get:processtime").routeId("processTime").to("direct:makeTime");
+//        from("rest:get:processtime").routeId("processTime").to("direct:makeTime");
+
+        rest().produces("application/json").get("/processtime").to("direct:makeTime");
 
         from("direct:makeTime").routeId("makeTime")
                 .process(exchange -> {
@@ -36,25 +39,19 @@ public class TimeRoute extends RouteBuilder {
                     Time time = exchange.getIn().getBody(Time.class);
                     time.setNow(LocalDateTime.now());
                     exchange.getOut().setBody(time);
-                })
-                .to("direct:marsh");
-
-        from("direct:marsh").routeId("marsh")
-                .marshal()
-                .json(JsonLibrary.Jackson);
+                });
+//                .to("direct:marsh");
+//
+//        from("direct:marsh").routeId("marsh")
+//                .marshal()
+//                .json(JsonLibrary.Jackson);
 
 
 
         from("cxf:bean:endpoint")
                 .process(exchange -> {
                     final Input input = exchange.getIn().getBody(Input.class);
-
-                    final Output output = new Output();
-                    System.out.println(input.getRequestName());
-                    output.setOutputResult(input.getRequestName().concat(", Welcome to JavaOutOfBounds.com"));
-                    output.setTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-
-                    exchange.getOut().setBody(output);
+                    exchange.getIn().setHeader("name", input.getRequestName());
                 });
 
     }

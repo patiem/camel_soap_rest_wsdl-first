@@ -24,8 +24,9 @@
             <xsd:element name="output">
                 <xsd:complexType>
                     <xsd:sequence>
-                        <xsd:element name="outputResult" type="xsd:string" />
+                        <xsd:element name="message" type="xsd:string" />
                         <xsd:element name="time" type="xsd:string" />
+                        <xsd:element name="count" type="xsd:int" />
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
