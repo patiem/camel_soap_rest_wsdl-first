@@ -44,10 +44,12 @@ public class TimeRoute extends RouteBuilder {
                     Time time = exchange.getIn().getBody(Time.class);
                     time.setNow(LocalDateTime.now());
                     exchange.getOut().setBody(time);
-                }).to("direct:marsh");
+                })
+                .to("direct:marsh");
 
         from("direct:marsh").routeId("marsh")
-                .marshal().json(JsonLibrary.Jackson);
+                .marshal()
+                .json(JsonLibrary.Jackson);
 
 
         from("rest:get:manytime")
@@ -59,36 +61,58 @@ public class TimeRoute extends RouteBuilder {
                     List<String> names = queryMap.getOrDefault("name", noName);
                     exchange.getOut().setBody(names);
                 })
-                .split(body(), new TimeAgrr()).parallelProcessing()
-                .to(("bean:timeService?method=getTime(${body})"))
+                .split(body(), new AggregationStrategy() {
+                    @Override
+                    public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
+                        if (oldExchange == null) {
+                            Time firstTime = newExchange.getIn().getBody(Time.class);
+                            System.out.println("first:" + firstTime);
+                            List<Time> times = new ArrayList<>();
+                            times.add(firstTime);
+                            newExchange.getIn().setBody(times);
+                            return newExchange;
+                        }
+
+                        Time nextTime = newExchange.getIn().getBody(Time.class);
+                        System.out.println("nest:" + nextTime);
+
+                        ArrayList<Time> times = oldExchange.getIn().getBody(ArrayList.class);
+                        System.err.println(times);
+
+                        times.add(nextTime);
+                        newExchange.getIn().setBody(times);
+                        return newExchange;
+                    }
+                })
+                    .to(("bean:timeService?method=getTime(${body})"))
                 .end()
                 .to("direct:marsh");
 
-    }
+    }lambda""
 }
 
-@Component
-class TimeAgrr implements AggregationStrategy {
-
-    @Override
-    public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
-        if (oldExchange == null) {
-            Time firstTime = newExchange.getIn().getBody(Time.class);
-            System.out.println("first:" + firstTime);
-            List<Time> times = new ArrayList<>();
-            times.add(firstTime);
-            newExchange.getIn().setBody(times);
-            return newExchange;
-        }
-
-        Time nextTime = newExchange.getIn().getBody(Time.class);
-        System.out.println("nest:" + nextTime);
-
-        ArrayList<Time> times = oldExchange.getIn().getBody(ArrayList.class);
-        System.err.println(times);
-
-        times.add(nextTime);
-        newExchange.getIn().setBody(times);
-        return newExchange;
-    }
-}
+//@Component
+//class TimeAgrr implements AggregationStrategy {
+//
+//    @Override
+//    public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
+//        if (oldExchange == null) {
+//            Time firstTime = newExchange.getIn().getBody(Time.class);
+//            System.out.println("first:" + firstTime);
+//            List<Time> times = new ArrayList<>();
+//            times.add(firstTime);
+//            newExchange.getIn().setBody(times);
+//            return newExchange;
+//        }
+//
+//        Time nextTime = newExchange.getIn().getBody(Time.class);
+//        System.out.println("nest:" + nextTime);
+//
+//        ArrayList<Time> times = oldExchange.getIn().getBody(ArrayList.class);
+//        System.err.println(times);
+//
+//        times.add(nextTime);
+//        newExchange.getIn().setBody(times);
+//        return newExchange;
+//    }
+//}
