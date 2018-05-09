@@ -1,10 +1,8 @@
 package com.benczykuadama.testdrive;
 
-import com.benczykuadama.testdrive.beans.TimeService;
+import com.benczykuadama.testdrive.beans.OutputService;
 import com.benczykuadama.testdrive.model.Time;
 import com.benczykuadama.testdrive.routes.TimeRoute;
-import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
 import org.apache.camel.builder.AdviceWithRouteBuilder;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
@@ -14,9 +12,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.naming.Context;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class TimeRouteTest extends CamelTestSupport {
 
@@ -92,7 +87,7 @@ public class TimeRouteTest extends CamelTestSupport {
     @Override
     protected Context createJndiContext() throws Exception {
         JndiContext context = new JndiContext();
-        context.bind("timeService", new TimeService());
+        context.bind("timeService", new OutputService());
         return context;
     }
 }

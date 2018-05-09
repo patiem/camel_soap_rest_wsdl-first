@@ -19,7 +19,6 @@ public class TimeConfig {
         CxfEndpoint cxfEndpoint = new CxfEndpoint();
         cxfEndpoint.setAddress("/greetings");
         cxfEndpoint.setServiceClass(Greetings.class);
-        //cxfEndpoint.setWsdlURL("wsdl/students.wsdl");
         cxfEndpoint.setBus(bus);
         return cxfEndpoint;
     }
